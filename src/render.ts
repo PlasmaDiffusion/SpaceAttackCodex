@@ -9,7 +9,7 @@ export interface GameRenderer {
   app: Application;
   playerTexture: Texture;
   enemyTexture: Texture;
-  bulletTexture: Texture;
+  projectileTexture: Texture;
   render(entities: Entity[]): void;
   setPaused(paused: boolean): void;
 }
@@ -72,7 +72,7 @@ export async function createRenderer(mount: HTMLElement): Promise<GameRenderer> 
     .roundRect(-22, -15, 44, 30, 5)
     .fill('#ff6482')
     .stroke({ color: '#ffd1dc', width: 2 });
-  const bulletGraphic = new Graphics()
+  const projectileGraphic = new Graphics()
     .roundRect(-3, -11, 6, 22, 3)
     .fill('#ffe47a');
 
@@ -80,9 +80,12 @@ export async function createRenderer(mount: HTMLElement): Promise<GameRenderer> 
     app,
     playerTexture: app.renderer.generateTexture(playerGraphic),
     enemyTexture: app.renderer.generateTexture(enemyGraphic),
-    bulletTexture: app.renderer.generateTexture(bulletGraphic),
+    projectileTexture: app.renderer.generateTexture(projectileGraphic),
     render(entities) {
-      for (const entity of entities) entity.render(stage);
+      for (const entity of entities) {
+        entity.render(entity.x, entity.y, entity.texture);
+        if (entity.parent !== stage) stage.addChild(entity);
+      }
     },
     setPaused(paused) {
       pauseLabel.visible = paused;

@@ -1,6 +1,7 @@
 import './style.css';
 import { createInput } from './input';
-import { Enemy, Player } from './entities';
+import { Enemy } from './entities/Enemy';
+import { Player } from './entities/Player';
 import { createRenderer } from './render';
 import type { Entity } from './entity';
 
@@ -23,17 +24,12 @@ async function startGame(): Promise<void> {
   renderer.app.ticker.add((ticker) => {
     const deltaTime = ticker.deltaTime;
     if (!paused) {
-      let direction = 0;
-      if (input.isDown('a') || input.isDown('arrowleft')) direction -= 1;
-      if (input.isDown('d') || input.isDown('arrowright')) direction += 1;
-      player.move(direction);
-
-      if (input.wasPressed(' ')) entities.push(player.shoot(renderer.bulletTexture));
-
+      const projectile = player.handleInput(input, renderer.projectileTexture);
+      if (projectile) entities.push(projectile);
       for (const entity of entities) entity.update(deltaTime);
     } else {
-      // Consume a space press while paused so it does not fire on resume.
-      input.wasPressed(' ');
+      // Let Player consume input while paused without moving or firing.
+      player.handleInput(input, renderer.projectileTexture, false);
     }
     renderer.render(entities);
   });

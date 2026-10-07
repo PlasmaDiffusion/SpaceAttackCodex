@@ -8,6 +8,11 @@ export type GameKey =
   | ' '
   | 'escape';
 
+export interface InputState {
+  isDown(key: GameKey): boolean;
+  wasPressed(key: GameKey): boolean;
+}
+
 const acceptedKeys = new Set<GameKey>([
   'a', 'd', 'arrowleft', 'arrowright', 'arrowup', 'arrowdown', ' ', 'escape',
 ]);

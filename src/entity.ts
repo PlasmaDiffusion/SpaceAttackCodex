@@ -1,4 +1,4 @@
-import { Container, Sprite } from 'pixi.js';
+import { Sprite } from 'pixi.js';
 import type { Texture } from 'pixi.js';
 
 /** Shared sprite and movement state for every game object. */
@@ -38,7 +38,9 @@ export class Entity extends Sprite {
       && a.y + a.height > b.y;
   }
 
-  render(stage: Container): void {
-    if (this.parent !== stage) stage.addChild(this);
+  render(x: number, y: number, texture: Texture): this {
+    this.position.set(x, y);
+    this.texture = texture;
+    return this;
   }
 }
