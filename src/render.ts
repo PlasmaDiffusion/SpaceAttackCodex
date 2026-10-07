@@ -1,12 +1,16 @@
 import { Application, Container, Graphics, Text } from 'pixi.js';
+import type { Texture } from 'pixi.js';
+import type { Entity } from './entity';
 
 export const GAME_WIDTH = 1000;
 export const GAME_HEIGHT = 620;
-const PLAYER_HALF_WIDTH = 34;
 
 export interface GameRenderer {
   app: Application;
-  movePlayer(direction: number, deltaTime: number): void;
+  playerTexture: Texture;
+  enemyTexture: Texture;
+  bulletTexture: Texture;
+  render(entities: Entity[]): void;
   setPaused(paused: boolean): void;
 }
 
@@ -22,50 +26,31 @@ export async function createRenderer(mount: HTMLElement): Promise<GameRenderer> 
   });
   mount.appendChild(app.canvas);
 
-  const scene = new Container();
-  app.stage.addChild(scene);
+  const stage = new Container();
+  app.stage.addChild(stage);
 
-  // A subtle star grid gives the play area a sense of scale without distracting from the player.
   const grid = new Graphics();
   for (let x = 40; x < GAME_WIDTH; x += 40) {
     for (let y = 40; y < GAME_HEIGHT; y += 40) {
       grid.circle(x, y, 1).fill({ color: '#8799bd', alpha: 0.16 });
     }
   }
-  scene.addChild(grid);
-
-  const groundY = GAME_HEIGHT - 76;
-  const ground = new Graphics()
-    .moveTo(0, groundY)
-    .lineTo(GAME_WIDTH, groundY)
-    .stroke({ color: '#394863', width: 2 });
-  scene.addChild(ground);
-
-  const triangle = new Graphics()
-    .moveTo(0, -34)
-    .lineTo(30, 24)
-    .lineTo(-30, 24)
-    .closePath()
-    .fill('#72f2c4')
-    .stroke({ color: '#d0fff0', width: 2 });
-  triangle.x = GAME_WIDTH / 2;
-  triangle.y = groundY - 26;
-  scene.addChild(triangle);
+  stage.addChild(grid);
 
   const title = new Text({
-    text: 'TRIANGLE RUNNER',
+    text: 'SPACE ATTACK CODEX',
     style: { fontFamily: 'Space Grotesk, sans-serif', fontSize: 16, fontWeight: '700', fill: '#f1f5ff', letterSpacing: 2 },
   });
   title.position.set(28, 24);
-  scene.addChild(title);
+  stage.addChild(title);
 
   const instructions = new Text({
-    text: 'MOVE  A / D  OR  ← / →',
+    text: 'MOVE  A / D  OR  ← / →     FIRE  SPACE',
     style: { fontFamily: 'DM Mono, monospace', fontSize: 12, fill: '#8e9bb5', letterSpacing: 1 },
   });
   instructions.anchor.set(1, 0);
   instructions.position.set(GAME_WIDTH - 28, 27);
-  scene.addChild(instructions);
+  stage.addChild(instructions);
 
   const pauseLabel = new Text({
     text: 'PAUSED',
@@ -74,13 +59,30 @@ export async function createRenderer(mount: HTMLElement): Promise<GameRenderer> 
   pauseLabel.anchor.set(0.5);
   pauseLabel.position.set(GAME_WIDTH / 2, GAME_HEIGHT / 2);
   pauseLabel.visible = false;
-  scene.addChild(pauseLabel);
+  stage.addChild(pauseLabel);
+
+  const playerGraphic = new Graphics()
+    .moveTo(0, -24)
+    .lineTo(22, 18)
+    .lineTo(-22, 18)
+    .closePath()
+    .fill('#72f2c4')
+    .stroke({ color: '#d0fff0', width: 2 });
+  const enemyGraphic = new Graphics()
+    .roundRect(-22, -15, 44, 30, 5)
+    .fill('#ff6482')
+    .stroke({ color: '#ffd1dc', width: 2 });
+  const bulletGraphic = new Graphics()
+    .roundRect(-3, -11, 6, 22, 3)
+    .fill('#ffe47a');
 
   return {
     app,
-    movePlayer(direction, deltaTime) {
-      triangle.x += direction * 360 * (deltaTime / 60);
-      triangle.x = Math.max(PLAYER_HALF_WIDTH, Math.min(GAME_WIDTH - PLAYER_HALF_WIDTH, triangle.x));
+    playerTexture: app.renderer.generateTexture(playerGraphic),
+    enemyTexture: app.renderer.generateTexture(enemyGraphic),
+    bulletTexture: app.renderer.generateTexture(bulletGraphic),
+    render(entities) {
+      for (const entity of entities) entity.render(stage);
     },
     setPaused(paused) {
       pauseLabel.visible = paused;
