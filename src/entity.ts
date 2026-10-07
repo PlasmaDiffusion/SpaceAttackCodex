@@ -22,7 +22,7 @@ export class Entity extends Sprite {
     this.velY = options.velY ?? 0;
   }
 
-  /** deltaTime is Pixi's normalized ticker delta (1 is one frame at 60 FPS). */
+  /** deltaTime is elapsed seconds, making velocities pixels per second. */
   update(deltaTime: number): void {
     this.x += this.velX * deltaTime;
     this.y += this.velY * deltaTime;

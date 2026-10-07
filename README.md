@@ -1,6 +1,6 @@
 # Space Attack Codex
 
-A TypeScript and PixiJS starter with a movable player triangle, horizontally moving enemies, and upward-flying bullets. The player, enemies, and bullets are sprite-based entities with shared movement, health, AABB collision, and rendering behavior.
+A TypeScript and PixiJS arcade shooter with five enemy rows, diving attackers, projectiles, score, lives, waves, and a saved high score.
 
 ## Run
 
@@ -15,6 +15,5 @@ npm run dev
 - Move right: **D** or **→**
 - Fire: **Space**
 - Pause or resume: **Escape**
-- **↑** and **↓** are detected and have no gameplay action yet.
 
-Movement and entity updates use PixiJS's ticker delta, so motion is scaled consistently across frame rates.
+The project uses delta-scaled entity movement and separates input, entity, rendering, and HUD code into their own modules.
